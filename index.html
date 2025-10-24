@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Aviator HackBot — Sky Soft (Demo)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#0b1020; --panel:#121936; --muted:#7f8db3; --text:#e8eeff; --accent:#66e6a3; --accent2:#8ad1ff; --warning:#ffcc66; --danger:#ff6b6b; --stroke:rgba(255,255,255,.08); --good:#6bff7f; --good2:#52e26a; --btnText:#081019; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{ margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--text); background:radial-gradient(1200px 800px at 80% -10%,rgba(138,209,255,.18),transparent),linear-gradient(180deg,#0b1020,#0b1020); }
+    .wrap{max-width:980px;margin:12px auto 100px;padding:0 12px}
+    .card{background:linear-gradient(180deg,#121936,#0d1330);border:1px solid var(--stroke);border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.4);overflow:hidden}
+
+    header{padding:14px 12px;border-bottom:1px solid var(--stroke);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    header .logo{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg, var(--accent), var(--accent2));color:#081019;font-weight:800}
+    header h1{font-size:18px;margin:0}
+    header p{margin:0;color:var(--muted);font-size:12px}
+
+    .status{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+    .tag{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;font-size:12px;border:1px solid var(--stroke);background:#0d1433}
+    .tag.good{background:linear-gradient(135deg,#2be6a0,#7bf0ff);color:#00131a;border:0;font-weight:800}
+    .dot{width:8px;height:8px;border-radius:999px;background:#66e6a3;box-shadow:0 0 10px #66e6a3}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:12px}
+    @media (max-width:860px){.grid{grid-template-columns:1fr;gap:12px;padding:10px}}
+
+    .panel{background:rgba(255,255,255,.03);border:1px solid var(--stroke);border-radius:16px;padding:12px}
+    .panel h2{margin:0 0 10px;font-size:15px}
+
+    button{appearance:none;border:0;background:linear-gradient(135deg,var(--accent),#10c080);color:#041015;padding:14px 16px;border-radius:12px;font-weight:800;letter-spacing:.2px;cursor:pointer;box-shadow:0 6px 20px rgba(16,192,128,.35);touch-action:manipulation;width:100%}
+    .sys{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;background:#0a0f22;border:1px solid var(--stroke);border-radius:12px;padding:12px;min-height:100px;max-height:220px;overflow:auto;color:#cfe3ff;font-size:13px;line-height:1.5}
+
+    .signals{display:grid;gap:10px}
+    .sig{border:1px solid var(--stroke);border-radius:14px;padding:12px;background:rgba(255,255,255,.03)}
+    .sig h3{margin:0 0 6px;font-size:15px}
+    .sig p{margin:4px 0;color:var(--muted)}
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
+    .safe{background:rgba(102,230,163,.15);color:#8bffca;border:1px solid rgba(102,230,163,.5)}
+    .risk{background:rgba(255,204,102,.15);color:#ffdf9a;border:1px solid rgba(255,255,255,.5)}
+    .copy{background:#121b3e;color:#dfe8ff;border:1px solid rgba(255,255,255,.12)}
+
+    .footer{padding:12px;border-top:1px solid var(--stroke);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+    .hint{color:#9fb6ff}
+
+    /* MODAL */
+    .modal{position:fixed;inset:0;z-index:90;display:none;place-items:center;background:rgba(4,8,20,.58);backdrop-filter:blur(6px)}
+    .modal.active{display:grid}
+    .sheet{width:min(560px,92vw);background:linear-gradient(180deg,#141a3a,#0f1431);border:1px solid var(--stroke);border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.55);overflow:hidden}
+    .sheet header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--stroke)}
+    .sheet h2{margin:0;font-size:18px}
+    .sheet .content{padding:12px 14px}
+    .modal-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .cta{background:linear-gradient(135deg,var(--good),var(--good2));color:var(--btnText);border:none;border-radius:12px;padding:12px 16px;font-weight:800;box-shadow:0 10px 28px rgba(83,226,106,.35), inset 0 0 0 1px rgba(255,255,255,.25);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+    .ghost{font-size:12px;color:#9eb0d6}
+
+    /* Sticky mobile bar */
+    .sticky{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(180deg,#0f1633,#0b1127);border-top:1px solid var(--stroke);display:flex;padding:10px 12px;gap:10px;z-index:80}
+    .sticky .cta{flex:1;justify-content:center}
+
+    /* Mobile tweaks */
+    @media (max-width:420px){ header h1{font-size:16px} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="logo">✈︎</div>
+        <div>
+          <h1>Aviator HackBot · Sky Soft <span style="opacity:.7;font-size:.8em">DEMO</span></h1>
+          <p>Isyarat satu klik • Penyelarasan simulasi • Nota penganalisis</p>
+        </div>
+        <div class="status">
+          <span class="tag good">✔ Demo Disahkan</span>
+          <span class="tag"><span class="dot"></span> Masa operasi: 99.97%</span>
+          <span class="tag" id="onlineTag">Pengguna dalam talian: —</span>
+        </div>
+      </header>
+
+      <div class="grid">
+        <!-- Left: One-Click & Log -->
+        <section class="panel">
+          <h2>1) Dapatkan isyarat sekarang</h2>
+          <button id="oneClick">JANA ISYARAT (1 KLIK)</button>
+          <div class="sys" id="syslog" aria-live="polite" style="margin-top:10px"></div>
+        </section>
+
+        <!-- Right: Output signals -->
+        <section class="panel">
+          <h2>2) Pakej isyarat anda</h2>
+          <div class="signals" id="signals">
+            <div class="hint" style="font-size:13px;margin-bottom:6px">Pratonton demo. Bot penuh dibuka selepas deposit.</div>
+            <div class="small">Tekan <span class="hint">JANA ISYARAT</span> untuk melihat pratonton.</div>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <h2>3) Status & Metrik</h2>
+        <div class="hint">Demo memaparkan metrik sampel. Akses penuh selepas deposit.</div>
+      </section>
+
+      <div class="footer">
+        <div>Mod Selamat sasarkan konsistensi. Mod Berisiko Tinggi buru lonjakan — guna dengan disiplin.</div>
+        <div>v0.3 demo • SkySoft</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky mobile actions -->
+  <div class="sticky">
+    <a class="cta" href="https://play-j8de.com/d1858bbbe?&webmaster_id=%7BREPLACE%7D&sub5=mag" target="_blank" rel="noopener">DEPOSIT SEKARANG</a>
+    <a class="cta" href="https://t.me/aniqshakirbot" target="_blank" rel="noopener">Hantar Tangkap Layar</a>
+  </div>
+
+  <!-- DEPOSIT MODAL (appears ~3s after click) -->
+  <div class="modal" id="depositModal" role="dialog" aria-modal="true" aria-labelledby="depTitle">
+    <div class="sheet">
+      <header>
+        <h2 id="depTitle">Akses penuh diperlukan</h2>
+      </header>
+      <div class="content">
+        <p style="margin:0 0 6px;font-weight:700">Tiada baki deposit dikesan pada akaun anda. Untuk membuka akses penuh kepada sistem AI dan menerima isyarat sebenar, sila buat deposit sekurang-kurangnya <strong>45 MYR</strong> sekarang.</p>
+        <p class="ghost">(Akses demo terhad. Deposit minimum 45 MYR diperlukan untuk mengaktifkan bot penuh.)</p>
+        <div class="modal-actions">
+          <a class="cta" href="https://play-j8de.com/d1858bbbe?&webmaster_id=%7BREPLACE%7D&sub5=mag" target="_blank" rel="noopener">DEPOSIT 45 MYR+</a>
+          <a class="cta" style="background:linear-gradient(135deg,#8ad1ff,#66e6a3)" href="https://t.me/aniqshakirbot" target="_blank" rel="noopener">Hantar bukti di TG</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = sel => document.querySelector(sel);
+    // FIX: use <br> for HTML line breaks to avoid unterminated string errors
+    const log = (msg)=>{ const box=$('#syslog'); box.innerHTML += msg + '<br>'; box.scrollTop = box.scrollHeight; }
+
+    // Online users randomizer
+    function rnd(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+    function setOnline(){ const n = rnd(12,258); $('#onlineTag').textContent = 'Pengguna dalam talian: ' + n; }
+    setOnline(); setInterval(setOnline, 12000 + rnd(-3000,3000));
+
+    function seededRand(seed){ let x = 1779033703 ^ seed.length; for(let i=0;i<seed.length;i++) x = Math.imul(x ^ seed.charCodeAt(i), 3432918353) >>> 0; x ^= x >>> 13; x = Math.imul(x, 3266489909) >>> 0; x ^= x >>> 16; return ()=> (x = (x + 0x6D2B79F5) >>> 0, (x ^ (x>>>15)) / 2**32); }
+
+    function makeSignals(){
+      const key = String(Date.now());
+      const r = seededRand(key);
+      const base = (1.35 + r()*0.35).toFixed(2);
+      const hi   = (2.1 + r()*1.4).toFixed(2);
+      const conf = 68 + Math.round(r()*22);
+      const win  = 10 + Math.floor(r()*40);
+      const notes=[
+        'Corak meningkat, tetingkap volatiliti rendah dikesan.',
+        'Penurunan pendek → jangka lantunan; elak cash-out panik awal.',
+        'Jalur volatiliti mengecil — kenaikan lebih selamat dijangka.',
+        'Kebarangkalian lonjakan selepas :30s, pantau rapi.',
+        'Sambungan trend memihak; patuhi peraturan henti.'
+      ];
+      const nidx=Math.floor(r()*notes.length);
+      $('#signals').innerHTML = `
+        <div class="sig">
+          <h3>Mod Selamat <span class="badge safe">KONSISTEN</span></h3>
+          <p><b>Auto cash-out:</b> ${base}x</p>
+          <p><b>Tetingkap masuk:</b> ${win}s · <b>Keyakinan:</b> ${conf}%</p>
+          <p class="small">Penganalisis: ${notes[nidx]}</p>
+          <div style="display:flex;gap:8px;margin-top:8px"><button class="copy" data-copy="SAFE ${base}x">Salin</button></div>
+        </div>
+        <div class="sig">
+          <h3>Mod Berisiko Tinggi <span class="badge risk">AGRESIF</span></h3>
+          <p><b>Sasaran cash-out manual:</b> ${hi}x</p>
+          <p><b>Tetingkap masuk:</b> ${Math.max(15, win-5)}s · <b>Keyakinan:</b> ${Math.max(0,conf-8)}%</p>
+          <div style="display:flex;gap:8px;margin-top:8px"><button class="copy" data-copy="HIGH-RISK ${hi}x">Salin</button></div>
+        </div>`;
+    }
+
+    // One-click flow
+    let depTimer=null;
+    $('#oneClick').addEventListener('click', ()=>{
+      log('> Menyambung ke pelayan…');
+      log('> Menjana isyarat pratonton…');
+      makeSignals();
+      if(depTimer) clearTimeout(depTimer);
+      depTimer = setTimeout(()=>{ $('#depositModal').classList.add('active'); }, 3000);
+    });
+
+    // Robust copy handler with focus + fallbacks to handle Permissions Policy blocks
+    function copyTextRobust(text, btn){
+      const markCopied = ()=>{ btn.textContent = 'Disalin!'; setTimeout(()=>btn.textContent='Salin',1100); };
+      try{ if(!document.hasFocus()) window.focus(); }catch(_){}
+
+      // Use Clipboard API if available & in secure context
+      if(window.isSecureContext && navigator.clipboard && typeof navigator.clipboard.writeText === 'function'){
+        // Must be called in a user gesture (our handler is a click)
+        navigator.clipboard.writeText(text)
+          .then(markCopied)
+          .catch(err=>{
+            // Fallback to execCommand for sandboxed/blocked contexts
+            legacyCopy(text) ? markCopied() : markCopied();
+            log('[INFO] Clipboard API disekat atau gagal: '+ (err && err.name || 'Unknown'));
+          });
+      } else {
+        // Legacy fallback
+        legacyCopy(text) ? markCopied() : markCopied();
+      }
+    }
+
+    function legacyCopy(text){
+      try{
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.setAttribute('readonly','');
+        ta.style.position='fixed'; ta.style.left='-9999px';
+        document.body.appendChild(ta);
+        ta.select(); ta.setSelectionRange(0, ta.value.length);
+        const ok = document.execCommand && document.execCommand('copy');
+        document.body.removeChild(ta);
+        return !!ok;
+      }catch(_){ return false; }
+    }
+
+    // Copy buttons (delegated)
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.copy');
+      if(!btn) return;
+      const t = btn.getAttribute('data-copy') || '';
+      copyTextRobust(t, btn);
+    });
+
+    // Close deposit modal on outside/Esc
+    const dep = $('#depositModal');
+    dep.addEventListener('click', (e)=>{ if(e.target===dep) dep.classList.remove('active'); });
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && dep.classList.contains('active')) dep.classList.remove('active'); });
+
+    // --- Tests ---
+    (function runTests(){
+      const pass = (n)=>log(`[PASS] ${n}`); const fail = (n)=>log(`[FAIL] ${n}`);
+      try{
+        // Existing tests
+        if(document.querySelectorAll('#oneClick').length===1) pass('Satu butang utama wujud'); else fail('Satu butang utama wujud');
+        $('#oneClick').click();
+        setTimeout(()=>{ if($('#signals').innerHTML.includes('Mod Selamat')) pass('Isyarat dijana'); else fail('Isyarat dijana'); }, 200);
+        setTimeout(()=>{ if($('#depositModal').classList.contains('active')) pass('Modal deposit muncul dalam 3s'); else fail('Modal deposit muncul dalam 3s'); }, 3200);
+
+        // Additional tests (leave existing ones untouched)
+        setTimeout(()=>{
+          const btn = document.querySelector('.sig .copy');
+          if(btn){
+            // Simulate normal copy
+            btn.click();
+            setTimeout(()=>{ btn.textContent.includes('Disalin') ? pass('Butang Salin berfungsi') : fail('Butang Salin berfungsi'); }, 120);
+          } else { fail('Butang Salin tersedia'); }
+        }, 650);
+
+        setTimeout(()=>{
+          // Force fallback path by temporarily disabling Clipboard API
+          const btn = document.querySelector('.sig .copy');
+          const orig = navigator.clipboard;
+          try { Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true }); } catch(_) {}
+          btn && btn.click();
+          setTimeout(()=>{ (btn && btn.textContent.includes('Disalin')) ? pass('Fallback salinan berfungsi tanpa Clipboard API') : fail('Fallback salinan berfungsi tanpa Clipboard API');
+            // restore if possible
+            try { Object.defineProperty(navigator, 'clipboard', { value: orig, configurable: true }); } catch(_) {}
+          }, 150);
+        }, 900);
+
+        setTimeout(()=>{
+          const txt = document.querySelector('#depositModal .content').innerText || '';
+          /45\s*MYR/i.test(txt) ? pass('Modal menyatakan 45 MYR') : fail('Modal menyatakan 45 MYR');
+        }, 3300);
+      }catch(e){ log('[TEST ERROR] '+e.message); }
+    })();
+  </script>
+</body>
+</html>
