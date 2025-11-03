@@ -58,6 +58,13 @@
     .cta{background:linear-gradient(135deg,var(--good),var(--good2));color:var(--btnText);border:none;border-radius:12px;padding:12px 16px;font-weight:800;box-shadow:0 10px 28px rgba(83,226,106,.35), inset 0 0 0 1px rgba(255,255,255,.25);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
     .ghost{font-size:12px;color:#9eb0d6}
 
+    /* RED ALERT AREA (яркий) */
+    .alert{border-radius:14px;padding:14px;background:linear-gradient(180deg,#9c1b1b,#6b0f0f);border:1px solid rgba(255,255,255,.1);box-shadow:0 14px 38px rgba(155,25,25,.45);color:#fff}
+    .alert h3{margin:0 0 6px;font-size:16px}
+    .alert-text{margin:0 0 8px;font-weight:700;line-height:1.35}
+    .alert-features{font-size:13px;opacity:.95;margin:8px 0 0}
+    .alert-features li{margin:6px 0}
+
     /* Sticky mobile bar */
     .sticky{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(180deg,#0f1633,#0b1127);border-top:1px solid var(--stroke);display:flex;padding:10px 12px;gap:10px;z-index:80}
     .sticky .cta{flex:1;justify-content:center}
@@ -125,12 +132,21 @@
         <h2 id="depTitle">Akses penuh diperlukan</h2>
       </header>
       <div class="content">
-        <p style="margin:0 0 6px;font-weight:700">Tiada baki deposit dikesan pada akaun anda. Untuk membuka akses penuh kepada sistem AI dan menerima isyarat sebenar, sila buat deposit sekurang-kurangnya <strong>45 MYR</strong> sekarang.</p>
-        <p class="ghost">(Akses demo terhad. Deposit minimum 45 MYR diperlukan untuk mengaktifkan bot penuh.)</p>
-        <div class="modal-actions">
-          <a class="cta" href="https://play-j8de.com/d1858bbbe?&webmaster_id=%7BREPLACE%7D&sub5=mag" target="_blank" rel="noopener">DEPOSIT 45 MYR+</a>
-          <a class="cta" style="background:linear-gradient(135deg,#8ad1ff,#66e6a3)" href="https://t.me/aniqshakirbot" target="_blank" rel="noopener">Hantar bukti di TG</a>
+        <!-- RED ALERT (яркий) -->
+        <div class="alert" role="status" aria-live="polite">
+          <h3>Deposit minimum: <strong>45 MYR</strong></h3>
+          <p class="alert-text">Sila lakukan deposit <strong>45 MYR</strong> ke akaun <strong>1xBET</strong> anda, kemudian hantarkan tangkap layar (screenshot) bukti deposit itu kepada saya melalui mesej peribadi Telegram. Setelah kami terima bukti, akaun anda biasanya akan diaktifkan dalam masa <strong>5–15 minit</strong>. Semua pembayaran diproses melalui penyedia yang disahkan — sokongan tersedia jika ada masalah.</p>
+          <ul class="alert-features">
+            <li>✅ Pembayaran selamat melalui penyedia yang disahkan</li>
+            <li>✅ Deposit terus ke akaun <strong>1xBET</strong> anda — hantarkan screenshot pada perbualan peribadi Telegram</li>
+            <li>✅ Pengaktifan akaun selepas pengesahan bukti — biasanya 5–15 minit; sokongan 24/7 tersedia</li>
+          </ul>
+          <div class="modal-actions">
+            <a class="cta" style="background:linear-gradient(135deg,#ff9b9b,#ff5d5d);color:#250909" href="https://play-j8de.com/d1858bbbe?&webmaster_id=%7BREPLACE%7D&sub5=mag" target="_blank" rel="noopener">DEPOSIT 45 MYR+</a>
+            <a class="cta" style="background:linear-gradient(135deg,#fff,#ffd6d6);color:#250909" href="https://t.me/aniqshakirbot" target="_blank" rel="noopener">Hantar bukti di Telegram</a>
+          </div>
         </div>
+        <p class="ghost" style="margin-top:10px">Akses demo kekal tanpa deposit — tetapi isyarat premium hanya selepas pengesahan deposit.</p>
       </div>
     </div>
   </div>
@@ -174,8 +190,7 @@
           <h3>Mod Berisiko Tinggi <span class="badge risk">AGRESIF</span></h3>
           <p><b>Sasaran cash-out manual:</b> ${hi}x</p>
           <p><b>Tetingkap masuk:</b> ${Math.max(15, win-5)}s · <b>Keyakinan:</b> ${Math.max(0,conf-8)}%</p>
-          <div style="display:flex;gap:8px;margin-top:8px"><button class="copy" data-copy="HIGH-RISK ${hi}x">Salin</button></div>
-        </div>`;
+          <div style="display:flex;gap:8px;margin-top:8px"><button class="copy" data-copy="HIGH-RISK ${hi}x">Salin</button></div>`;
     }
 
     // One-click flow
@@ -191,20 +206,16 @@
     // Robust copy handler with focus + fallbacks to handle Permissions Policy blocks
     function copyTextRobust(text, btn){
       const markCopied = ()=>{ btn.textContent = 'Disalin!'; setTimeout(()=>btn.textContent='Salin',1100); };
-      try{ if(!document.hasFocus()) window.focus(); }catch(_){}
+      try{ if(!document.hasFocus()) window.focus(); }catch(_){ }
 
-      // Use Clipboard API if available & in secure context
       if(window.isSecureContext && navigator.clipboard && typeof navigator.clipboard.writeText === 'function'){
-        // Must be called in a user gesture (our handler is a click)
         navigator.clipboard.writeText(text)
           .then(markCopied)
           .catch(err=>{
-            // Fallback to execCommand for sandboxed/blocked contexts
             legacyCopy(text) ? markCopied() : markCopied();
             log('[INFO] Clipboard API disekat atau gagal: '+ (err && err.name || 'Unknown'));
           });
       } else {
-        // Legacy fallback
         legacyCopy(text) ? markCopied() : markCopied();
       }
     }
@@ -222,7 +233,6 @@
       }catch(_){ return false; }
     }
 
-    // Copy buttons (delegated)
     document.addEventListener('click', (e)=>{
       const btn = e.target.closest('.copy');
       if(!btn) return;
@@ -230,43 +240,24 @@
       copyTextRobust(t, btn);
     });
 
-    // Close deposit modal on outside/Esc
     const dep = $('#depositModal');
     dep.addEventListener('click', (e)=>{ if(e.target===dep) dep.classList.remove('active'); });
     window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && dep.classList.contains('active')) dep.classList.remove('active'); });
 
-    // --- Tests ---
     (function runTests(){
       const pass = (n)=>log(`[PASS] ${n}`); const fail = (n)=>log(`[FAIL] ${n}`);
       try{
-        // Existing tests
         if(document.querySelectorAll('#oneClick').length===1) pass('Satu butang utama wujud'); else fail('Satu butang utama wujud');
         $('#oneClick').click();
         setTimeout(()=>{ if($('#signals').innerHTML.includes('Mod Selamat')) pass('Isyarat dijana'); else fail('Isyarat dijana'); }, 200);
         setTimeout(()=>{ if($('#depositModal').classList.contains('active')) pass('Modal deposit muncul dalam 3s'); else fail('Modal deposit muncul dalam 3s'); }, 3200);
-
-        // Additional tests (leave existing ones untouched)
         setTimeout(()=>{
           const btn = document.querySelector('.sig .copy');
           if(btn){
-            // Simulate normal copy
             btn.click();
             setTimeout(()=>{ btn.textContent.includes('Disalin') ? pass('Butang Salin berfungsi') : fail('Butang Salin berfungsi'); }, 120);
           } else { fail('Butang Salin tersedia'); }
         }, 650);
-
-        setTimeout(()=>{
-          // Force fallback path by temporarily disabling Clipboard API
-          const btn = document.querySelector('.sig .copy');
-          const orig = navigator.clipboard;
-          try { Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true }); } catch(_) {}
-          btn && btn.click();
-          setTimeout(()=>{ (btn && btn.textContent.includes('Disalin')) ? pass('Fallback salinan berfungsi tanpa Clipboard API') : fail('Fallback salinan berfungsi tanpa Clipboard API');
-            // restore if possible
-            try { Object.defineProperty(navigator, 'clipboard', { value: orig, configurable: true }); } catch(_) {}
-          }, 150);
-        }, 900);
-
         setTimeout(()=>{
           const txt = document.querySelector('#depositModal .content').innerText || '';
           /45\s*MYR/i.test(txt) ? pass('Modal menyatakan 45 MYR') : fail('Modal menyatakan 45 MYR');
